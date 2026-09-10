@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Minimum Spanning Tree Visualizer | Kruskal & Prim</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="header-logo-icon">MST</div>
+        <div class="header-titles">
+          <h1 class="header-title">MST Visualizer</h1>
+          <span class="header-subtitle">Kruskal &amp; Prim Algorithm Explorer</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Interactive Mode</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Control Panel -->
+      <aside class="panel control-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Algorithm Controls
+          </h2>
+        </div>
+
+        <!-- Algorithm Selector -->
+        <div>
+          <div class="section-label">Select Algorithm</div>
+          <div class="segmented-control" id="algo-selector">
+            <button class="segmented-btn active" data-algo="kruskal">Kruskal</button>
+            <button class="segmented-btn" data-algo="prim">Prim</button>
+          </div>
+        </div>
+
+        <!-- Prim Starting Vertex Dropdown (Conditional) -->
+        <div id="prim-start-container" style="display: none;">
+          <div class="section-label">Starting Vertex</div>
+          <div class="select-wrapper">
+            <select id="prim-start-vertex" class="form-select">
+              <!-- Populated dynamically -->
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Execution Playback Controls -->
+        <div>
+          <div class="section-label">Algorithm Execution</div>
+          <div class="playback-controls">
+            <div class="playback-btn-group">
+              <button id="btn-start" class="btn btn-primary" title="Start algorithm from beginning">▶ Start</button>
+              <button id="btn-next" class="btn btn-secondary" title="Execute next single step">⏭ Next Step</button>
+            </div>
+            <div class="playback-btn-group">
+              <button id="btn-play" class="btn btn-accent" title="Auto-play algorithm steps">▶ Play</button>
+              <button id="btn-pause" class="btn btn-secondary" title="Pause auto-play" disabled>⏸ Pause</button>
+              <button id="btn-reset" class="btn btn-secondary" title="Reset algorithm execution">↻ Reset</button>
+            </div>
+            <div class="speed-control">
+              <span>Speed</span>
+              <input type="range" id="speed-slider" class="speed-slider" min="200" max="1800" step="100" value="800">
+              <span id="speed-value">0.8s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph Tools -->
+        <div>
+          <div class="section-label">Graph Editing Tools</div>
+          <div class="button-grid">
+            <button id="btn-mode-select" class="btn btn-secondary active">✋ Select / Drag</button>
+            <button id="btn-mode-vertex" class="btn btn-secondary">✚ Add Vertex</button>
+            <button id="btn-mode-edge" class="btn btn-secondary">⚡ Add Edge</button>
+            <button id="btn-mode-delete" class="btn btn-secondary">✕ Delete Item</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-grid" style="padding-top: 8px; border-top: 1px solid var(--color-soft-border);">
+          <button id="btn-load-sample" class="btn btn-secondary">↺ Sample Graph</button>
+          <button id="btn-clear-graph" class="btn btn-danger">🗑 Clear Graph</button>
+        </div>
+      </aside>
+
+      <!-- Graph Canvas Panel -->
+      <section class="panel canvas-panel">
+        <div class="canvas-toolbar">
+          <div class="toolbar-group">
+            <span class="section-label" style="margin: 0;" id="current-algorithm-heading">Kruskal’s Algorithm</span>
+          </div>
+          <div class="toolbar-group">
+            <span id="canvas-mode-badge" class="header-status" style="font-size: 12px; padding: 4px 10px;">
+              Mode: Select / Drag
+            </span>
+          </div>
+        </div>
+
+        <div class="canvas-container" id="canvas-container">
+          <svg id="graph-svg"></svg>
+          
+          <!-- Empty State -->
+          <div id="canvas-empty-state" class="canvas-empty-state" style="display: none;">
+            <div class="empty-icon">🕸</div>
+            <h3 class="empty-title">Build your graph</h3>
+            <p class="empty-text">Add vertices and weighted edges to begin exploring Minimum Spanning Trees.</p>
+            <button id="btn-empty-add-vertex" class="btn btn-primary" style="margin-top: 8px;">✚ Add Vertex</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Grid Sections -->
+      <div class="bottom-sections">
+        <!-- Live Statistics & Result Card -->
+        <section class="panel results-card">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 20V10M12 20V4M6 20v-6"/>
+              </svg>
+              Live Statistics &amp; MST Result
+            </h2>
+            <span id="mst-status-badge" class="header-status" style="font-size: 12px; padding: 3px 10px;">
+              Status: Ready
+            </span>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-label">Vertices</div>
+              <div id="stat-vertices" class="stat-value">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Edges</div>
+              <div id="stat-edges" class="stat-value">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">MST Edges</div>
+              <div id="stat-mst-edges" class="stat-value">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Total Weight</div>
+              <div id="stat-total-weight" class="stat-value">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Current Step</div>
+              <div id="stat-current-step" class="stat-value">0</div>
+            </div>
+          </div>
+
+          <!-- Result Table -->
+          <div>
+            <div class="section-label">Selected Minimum Spanning Tree Edges</div>
+            <div class="result-list-container">
+              <table class="result-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Edge Connection</th>
+                    <th>Weight</th>
+                  </tr>
+                </thead>
+                <tbody id="mst-results-tbody">
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--color-muted-blue); padding: 16px;">
+                      Run algorithm to generate Minimum Spanning Tree
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Execution Log Panel -->
+        <section class="panel log-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 17 10 11 14 15 20 9"/>
+                <polyline points="14 9 20 9 20 15"/>
+              </svg>
+              Algorithm Execution Log
+            </h2>
+            <button id="btn-clear-log" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; min-height: auto;">
+              Clear Log
+            </button>
+          </div>
+
+          <div class="log-container" id="log-container">
+            <div class="log-entry log-info">
+              <span class="log-badge">✓</span>
+              <span class="log-text">Application initialized. Select an algorithm and click ▶ Start or ⏭ Next Step.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Information & Explanation Row -->
+        <div class="info-row">
+          <!-- Educational Explanation Panel -->
+          <article class="explanation-card">
+            <h2 class="panel-title" id="explanation-title" style="margin-bottom: 12px;">How Kruskal’s Algorithm Works</h2>
+            <ol id="explanation-list" class="explanation-list">
+              <li>Sort all edges in non-decreasing order of their weight.</li>
+              <li>Pick the smallest edge and check if it forms a cycle with the spanning tree formed so far using <strong>Union-Find</strong>.</li>
+              <li>If cycle is not formed, include this edge in the MST. Else, reject it.</li>
+              <li>Repeat until there are \(V - 1\) edges in the spanning tree.</li>
+            </ol>
+          </article>
+
+          <!-- Complexity Card -->
+          <article class="complexity-card">
+            <h2 class="panel-title" style="margin-bottom: 12px;">Algorithm Complexity</h2>
+            <div id="complexity-content">
+              <div style="margin-bottom: 10px;">
+                <div class="section-label">Time Complexity</div>
+                <div id="complexity-time" class="complexity-badge">O(E log E)</div>
+              </div>
+              <div>
+                <div class="section-label">Space Complexity</div>
+                <div id="complexity-space" class="complexity-badge">O(V + E)</div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Legend Panel -->
+        <div class="info-row" style="grid-column: 1 / span 2;">
+          <div class="legend-container" style="width: 100%;">
+            <div class="section-label" style="margin: 0; align-self: center;">Legend:</div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background-color: var(--bg-soft-ivory); border: 2px solid var(--color-soft-border);"></span>
+              <span>Unvisited Vertex</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background-color: var(--color-sage);"></span>
+              <span>Visited Vertex</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background-color: var(--color-gold-accent);"></span>
+              <span>Current Vertex</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line" style="background-color: var(--color-muted-blue);"></span>
+              <span>Normal Edge</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line" style="background-color: var(--color-indigo);"></span>
+              <span>Considering Edge</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line" style="background-color: var(--color-success);"></span>
+              <span>MST Edge</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line" style="background-color: var(--color-error); border-bottom: 2px dashed var(--color-error);"></span>
+              <span>Rejected Edge</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Edge Modal -->
+  <div id="modal-add-edge" class="modal-overlay">
+    <div class="modal-card">
+      <h3 class="modal-title">Add Weighted Edge</h3>
+      <p id="modal-edge-endpoints" style="font-size: 14px; color: var(--color-muted-blue);">Connecting Vertex A to Vertex B</p>
+      <div>
+        <label for="edge-weight-input" class="section-label">Edge Weight (Positive Number)</label>
+        <input type="number" id="edge-weight-input" class="form-input" min="1" step="1" value="1">
+      </div>
+      <div class="modal-actions">
+        <button id="btn-modal-cancel-edge" class="btn btn-secondary">Cancel</button>
+        <button id="btn-modal-submit-edge" class="btn btn-primary">Add Edge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Graph Modal -->
+  <div id="modal-clear-confirm" class="modal-overlay">
+    <div class="modal-card">
+      <h3 class="modal-title">Clear Graph?</h3>
+      <p style="font-size: 14px; color: var(--color-muted-blue);">
+        This will remove all vertices, edges, and algorithm execution history. This action cannot be undone.
+      </p>
+      <div class="modal-actions">
+        <button id="btn-modal-cancel-clear" class="btn btn-secondary">Cancel</button>
+        <button id="btn-modal-submit-clear" class="btn btn-danger">Clear Graph</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/toast.js"></script>
+  <script src="js/unionFind.js"></script>
+  <script src="js/graphEngine.js"></script>
+  <script src="js/algorithms/kruskal.js"></script>
+  <script src="js/algorithms/prim.js"></script>
+  <script src="js/svgRenderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
