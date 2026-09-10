@@ -127,6 +127,29 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPause.addEventListener('click', pauseAlgorithm);
     btnReset.addEventListener('click', resetExecution);
 
+    // Mobile Playback Controls
+    const btnMobileStart = document.getElementById('btn-mobile-start');
+    const btnMobileNext = document.getElementById('btn-mobile-next');
+    const btnMobilePlay = document.getElementById('btn-mobile-play');
+    const btnMobilePause = document.getElementById('btn-mobile-pause');
+    const btnMobileReset = document.getElementById('btn-mobile-reset');
+    const btnRecenter = document.getElementById('btn-recenter-graph');
+
+    if (btnMobileStart) btnMobileStart.addEventListener('click', startAlgorithm);
+    if (btnMobileNext) btnMobileNext.addEventListener('click', nextStep);
+    if (btnMobilePlay) btnMobilePlay.addEventListener('click', playAlgorithm);
+    if (btnMobilePause) btnMobilePause.addEventListener('click', pauseAlgorithm);
+    if (btnMobileReset) btnMobileReset.addEventListener('click', resetExecution);
+
+    if (btnRecenter) {
+      btnRecenter.addEventListener('click', () => {
+        const container = document.getElementById('canvas-container');
+        graph.recenterGraph(container.clientWidth || 800, container.clientHeight || 500);
+        renderer.render();
+        toast.info('Graph centered.');
+      });
+    }
+
     speedSlider.addEventListener('input', () => {
       const val = Number(speedSlider.value);
       playSpeedMs = val;
@@ -280,11 +303,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnModeDelete.classList.toggle('active', mode === 'delete');
 
     let modeText = 'Select / Drag';
-    if (mode === 'add_vertex') modeText = 'Add Vertex (Click Canvas)';
-    if (mode === 'add_edge') modeText = 'Add Edge (Click Source then Target)';
-    if (mode === 'delete') modeText = 'Delete Item (Click Node or Edge)';
+    let hintText = '💡 Tip: Drag vertices to move';
+    if (mode === 'add_vertex') {
+      modeText = 'Add Vertex (Click Canvas)';
+      hintText = '💡 Tip: Tap anywhere on canvas to place vertex';
+    }
+    if (mode === 'add_edge') {
+      modeText = 'Add Edge (Click Source then Target)';
+      hintText = '💡 Tip: Tap Node A then Node B to connect edge';
+    }
+    if (mode === 'delete') {
+      modeText = 'Delete Item (Click Node or Edge)';
+      hintText = '💡 Tip: Tap any vertex or edge to delete it';
+    }
 
     badgeCanvasMode.textContent = `Mode: ${modeText}`;
+    const canvasHint = document.getElementById('canvas-hint');
+    if (canvasHint) canvasHint.textContent = hintText;
   }
 
   // ==========================================
@@ -393,6 +428,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPlay.disabled = true;
     btnPause.disabled = false;
 
+    const btnMobilePlay = document.getElementById('btn-mobile-play');
+    const btnMobilePause = document.getElementById('btn-mobile-pause');
+    if (btnMobilePlay) btnMobilePlay.style.display = 'none';
+    if (btnMobilePause) btnMobilePause.style.display = 'inline-flex';
+
     playIntervalId = setInterval(() => {
       if (currentStepIndex < steps.length - 1) {
         currentStepIndex++;
@@ -412,6 +452,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     btnPlay.disabled = false;
     btnPause.disabled = true;
+
+    const btnMobilePlay = document.getElementById('btn-mobile-play');
+    const btnMobilePause = document.getElementById('btn-mobile-pause');
+    if (btnMobilePlay) btnMobilePlay.style.display = 'inline-flex';
+    if (btnMobilePause) btnMobilePause.style.display = 'none';
   }
 
   function resetExecution() {

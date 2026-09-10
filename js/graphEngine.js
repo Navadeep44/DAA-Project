@@ -319,6 +319,44 @@ class Graph {
   }
 
   /**
+   * Recenter and scale all vertices neatly within canvas dimensions
+   */
+  recenterGraph(width = 800, height = 500) {
+    if (this.vertices.size === 0) return;
+    const vertices = Array.from(this.vertices.values());
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    vertices.forEach(v => {
+      if (v.x < minX) minX = v.x;
+      if (v.x > maxX) maxX = v.x;
+      if (v.y < minY) minY = v.y;
+      if (v.y > maxY) maxY = v.y;
+    });
+
+    const currentWidth = maxX - minX || 1;
+    const currentHeight = maxY - minY || 1;
+
+    const paddingX = width * 0.18;
+    const paddingY = height * 0.20;
+    const targetWidth = Math.max(100, width - 2 * paddingX);
+    const targetHeight = Math.max(100, height - 2 * paddingY);
+
+    const scaleX = targetWidth / currentWidth;
+    const scaleY = targetHeight / currentHeight;
+    const scale = Math.min(scaleX, scaleY, 1.2);
+
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    const targetCenterX = width / 2;
+    const targetCenterY = height / 2;
+
+    vertices.forEach(v => {
+      v.x = Math.round(targetCenterX + (v.x - centerX) * scale);
+      v.y = Math.round(targetCenterY + (v.y - centerY) * scale);
+    });
+  }
+
+  /**
    * Pre-load standard sample graph (from prompt section 18)
    */
   loadSampleGraph(width = 800, height = 500) {

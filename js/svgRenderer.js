@@ -263,7 +263,7 @@ class SVGRenderer {
       hitLine.setAttribute('x2', target.x);
       hitLine.setAttribute('y2', target.y);
       hitLine.setAttribute('stroke', 'transparent');
-      hitLine.setAttribute('stroke-width', '16');
+      hitLine.setAttribute('stroke-width', '26');
       hitLine.style.cursor = 'pointer';
       gEdge.appendChild(hitLine);
 

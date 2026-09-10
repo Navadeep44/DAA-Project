@@ -1015,3 +1015,62 @@ svg#graph-svg {
     grid-template-columns: 1fr;
   }
 }
+
+/* Canvas Hint Text */
+.canvas-hint-text {
+  font-size: 12px;
+  color: var(--color-muted-blue);
+  font-style: italic;
+}
+
+/* Mobile Floating Playback Bar */
+.mobile-playback-bar {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background-color: var(--bg-deep-navy);
+  border: 1px solid rgba(217, 222, 232, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 900;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.btn-mobile {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  min-height: 38px;
+}
+
+@media (max-width: 768px) {
+  .mobile-playback-bar {
+    display: flex;
+  }
+  
+  .canvas-hint-text {
+    display: none;
+  }
+
+  .toast-container {
+    top: 76px;
+    left: 16px;
+    right: 16px;
+  }
+
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .main-content {
+    padding-bottom: 80px; /* Space for floating mobile bar */
+  }
+}
+

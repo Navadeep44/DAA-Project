@@ -101,10 +101,12 @@
       <!-- Graph Canvas Panel -->
       <section class="panel canvas-panel">
         <div class="canvas-toolbar">
-          <div class="toolbar-group">
+          <div class="toolbar-group" style="align-items: center; gap: 10px;">
             <span class="section-label" style="margin: 0;" id="current-algorithm-heading">Kruskal’s Algorithm</span>
+            <span id="canvas-hint" class="canvas-hint-text">💡 Tip: Drag vertices to position</span>
           </div>
-          <div class="toolbar-group">
+          <div class="toolbar-group" style="align-items: center; gap: 8px;">
+            <button id="btn-recenter-graph" class="btn btn-secondary toolbar-btn" title="Recenter vertices on canvas">🎯 Recenter</button>
             <span id="canvas-mode-badge" class="header-status" style="font-size: 12px; padding: 4px 10px;">
               Mode: Select / Drag
             </span>
@@ -306,6 +308,15 @@
         <button id="btn-modal-submit-clear" class="btn btn-danger">Clear Graph</button>
       </div>
     </div>
+  </div>
+
+  <!-- Mobile Floating Playback Bar -->
+  <div id="mobile-playback-bar" class="mobile-playback-bar">
+    <button id="btn-mobile-start" class="btn btn-primary btn-mobile">▶ Start</button>
+    <button id="btn-mobile-next" class="btn btn-secondary btn-mobile">⏭ Next</button>
+    <button id="btn-mobile-play" class="btn btn-accent btn-mobile">▶ Play</button>
+    <button id="btn-mobile-pause" class="btn btn-secondary btn-mobile" style="display: none;">⏸ Pause</button>
+    <button id="btn-mobile-reset" class="btn btn-secondary btn-mobile">↻ Reset</button>
   </div>
 
   <!-- Scripts -->
